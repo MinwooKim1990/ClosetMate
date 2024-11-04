@@ -63,7 +63,22 @@ class Similarity:
         percentage = max(0, similarity_score * 100)
         return round(percentage, 2)
     
-    def get_recommendation_message(self, percentages, similarity_threshold=65):
+    def threshold(self, custom_threshold=None):
+
+        if custom_threshold is not None:
+            return custom_threshold
+            
+        model_thresholds = {
+            'dino': 88,
+            'deit': 65,
+            'vit': 60,
+            'resnet': 70
+        }
+    
+        return model_thresholds.get(self.model_type, 65)
+    
+    def get_recommendation_message(self, percentages, custom_threshold=None):
+        similarity_threshold = self.threshold(custom_threshold)
         similar_items_count = sum(percentages[0] >= similarity_threshold)
         
         if similar_items_count == 0:
@@ -71,7 +86,7 @@ class Similarity:
         else:
             return f"{similar_items_count}개의 유사도가 높은 아이템이 있습니다."
     
-    def attractiveness(self, query=None, k=None, return_percentage=False, similarity_threshold=65):
+    def attractiveness(self, query=None, k=None, return_percentage=False, custom_threshold=None):
         if query is not None:
             query_vector = query / np.linalg.norm(query, axis=1, keepdims=True)
         elif self.user_vector is not None:
@@ -86,8 +101,8 @@ class Similarity:
         
         if return_percentage:
             P_all = np.array([[self.calculate_similarity_percentage(score) 
-                             for score in row] for row in D_all])
-            recommendation = self.get_recommendation_message(P_all, similarity_threshold)
+                            for score in row] for row in D_all])
+            recommendation = self.get_recommendation_message(P_all, custom_threshold)
             return P_all, recommendation
         
         return D_all
