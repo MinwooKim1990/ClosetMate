@@ -25,7 +25,7 @@ class FeatureExtractor(nn.Module):
             self.feature_dim = 768
 
         elif model_type == 'dino':
-            self.model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16')
+            self.model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vitg14')
             self.model.head = nn.Identity()
             self.feature_dim = 768 
             

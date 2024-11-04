@@ -1,5 +1,6 @@
 import numpy as np
 import faiss
+from tools.saving import save_index, load_index
 
 class Similarity:
     def __init__(self, feature_vectors, dataset, user_vector=None):
@@ -59,13 +60,13 @@ class Similarity:
         percentage = max(0, similarity_score * 100)
         return round(percentage, 2)
     
-    def get_recommendation_message(self, percentages, similarity_threshold=70):
+    def get_recommendation_message(self, percentages, similarity_threshold=65):
         """
         Get recommendation message based on number of similar items
         
         Args:
             percentages (np.ndarray): Array of similarity percentages
-            similarity_threshold (float): Threshold for considering items as similar (default: 70%)
+            similarity_threshold (float): Threshold for considering items as similar (default: 65%)
             
         Returns:
             str: Recommendation message
@@ -76,9 +77,9 @@ class Similarity:
         if similar_items_count == 0:
             return "유사한 제품이 없어 구매를 추천 드립니다."
         else:
-            return f"{similar_items_count}개의 유사한 아이템이 있습니다."
+            return f"{similar_items_count}개의 유사도가 높은 아이템이 있습니다."
     
-    def attractiveness(self, query=None, k=None, return_percentage=False, similarity_threshold=70):
+    def attractiveness(self, query=None, k=None, return_percentage=False, similarity_threshold=65):
         """
         Find similar vectors and get recommendation
         

@@ -7,6 +7,7 @@ from tools.Extractor import FeatureExtractor
 from tools.saving import load_features, save_features
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(f"사용하는 장치: {device}")
 
 def extract_features(dataloader, feature_extractor, device):
     feature_extractor.eval()
