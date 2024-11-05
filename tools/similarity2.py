@@ -35,12 +35,15 @@ class Similarity:
                 raise ValueError("Feature vectors must be provided for new initialization")
             self._initialize_new(feature_vectors)
         
+        self.original_feature_vectors = feature_vectors.copy()
+
         # Initialize user vector if provided
         self.user_vector = None
         if user_vector is not None:
             self.user_vector = user_vector / np.linalg.norm(user_vector, axis=1, keepdims=True)
     
     def _initialize_new(self, feature_vectors):
+        self.original_feature_vectors = feature_vectors.copy()
         self.feature_vectors = feature_vectors / np.linalg.norm(feature_vectors, axis=1, keepdims=True)
         self.index = faiss.IndexFlatIP(self.feature_vectors.shape[1])
         self.index.add(self.feature_vectors)
@@ -57,7 +60,8 @@ class Similarity:
         
         _, indices = self.index.search(self.user_vector, k)
         recommended_indices = indices[0]
-        return list(recommended_indices)
+        original_recommended_vectors = [self.original_feature_vectors[idx] for idx in recommended_indices]
+        return list(recommended_indices), original_recommended_vectors
     
     def calculate_similarity_percentage(self, similarity_score):
         percentage = max(0, similarity_score * 100)
@@ -71,8 +75,8 @@ class Similarity:
         model_thresholds = {
             'dino': 88,
             'deit': 67,
-            'vit': 60,
-            'resnet': 70
+            'vit': 72,
+            'resnet': 88
         }
     
         return model_thresholds.get(self.model_type, 65)
