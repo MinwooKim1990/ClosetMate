@@ -70,7 +70,7 @@ class Similarity:
             
         model_thresholds = {
             'dino': 88,
-            'deit': 65,
+            'deit': 67,
             'vit': 60,
             'resnet': 70
         }
