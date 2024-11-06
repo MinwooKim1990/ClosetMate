@@ -88,7 +88,7 @@ class Similarity:
         if similar_items_count == 0:
             return "유사한 제품이 없어 구매를 추천 드립니다."
         else:
-            return f"{similar_items_count}개의 유사도가 높은 아이템이 있습니다."
+            return f"{similar_items_count}개의 유사도가 높은 아이템이 있습니다. 구매에 고려해주세요."
     
     def attractiveness(self, query=None, k=None, return_percentage=False, custom_threshold=None):
         if query is not None:

@@ -17,9 +17,12 @@ def load_features(user_name, model_type):
     return None
 
 def save_labels(user_name, labels, model_type, n_clusters):
-    save_path = f'saved/{user_name}_labels_{model_type}_{n_clusters}clusters.npy'
+    save_dir = 'saved'
+    os.makedirs(save_dir, exist_ok=True) 
+    save_path = os.path.join(save_dir, f"{user_name}_labels_{model_type}_{n_clusters}clusters.npy")
+   
     np.save(save_path, labels)
-    print(f"{user_name} clustered labels were saved to {save_path}.")
+    print(f"label saved to {save_path}.")
 
 def load_labels(user_name, model_type, n_clusters):
     load_path = f'saved/{user_name}_labels_{model_type}_{n_clusters}clusters.npy'
@@ -67,7 +70,7 @@ def save_kmeans_model(user_name, model, model_type, n_clusters):
     
     with open(model_path, 'wb') as f:
         pickle.dump(model, f)
-    print(f"모델이 저장되었습니다: {model_path}")
+    print(f"Model saved to {model_path}")
 
 def load_kmeans_model(user_name, model_type, n_clusters):
     model_path = f"saved/{user_name}_{model_type}_{n_clusters}clusters_model.pkl"
@@ -75,8 +78,8 @@ def load_kmeans_model(user_name, model_type, n_clusters):
     if os.path.exists(model_path):
         with open(model_path, 'rb') as f:
             model = pickle.load(f)
-        print(f"모델을 불러왔습니다: {model_path}")
+        print(f"Model load from {model_path}")
         return model
     else:
-        print(f"저장된 모델을 찾을 수 없습니다: {model_path}")
+        print(f"Cannot find a model from {model_path}")
         return None

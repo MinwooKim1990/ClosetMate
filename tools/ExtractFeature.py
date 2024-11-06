@@ -7,14 +7,14 @@ from tools.Extractor import FeatureExtractor
 from tools.saving import load_features, save_features
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"사용하는 장치: {device}")
+print(f"Using Device: {device}")
 
 def extract_features(dataloader, feature_extractor, device):
     feature_extractor.eval()
     features_list = []
     
     with torch.no_grad():
-        for images in tqdm(dataloader, desc="특징 추출"):
+        for images in tqdm(dataloader, desc="Feature Extraction"):
             images = images.to(device)
             features = feature_extractor(images)
             features_list.append(features.cpu())
@@ -33,7 +33,7 @@ def extract_features_from_images(image_paths, feature_extractor, device, transfo
     ])
     
     with torch.no_grad():
-        for img_path in tqdm(image_paths, desc="Feature extraction"):
+        for img_path in tqdm(image_paths, desc="Feature Extraction"):
             image = Image.open(img_path).convert('RGB')
             image = transform(image).unsqueeze(0).to(device)
             

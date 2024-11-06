@@ -13,7 +13,7 @@ def perform_clustering_with_cache(user_name, features, model_type, n_clusters=13
         if labels is not None and kmeans is not None:
             return labels, kmeans
     
-    print("K-means 클러스터링 수행 중...")
+    print("K-means Clustering...")
     kmeans = KMeans(n_clusters=n_clusters, random_state=2024)
     labels = kmeans.fit_predict(features)
     
@@ -28,32 +28,77 @@ def show_cluster_images(dataset, labels, cluster_num, num_samples=5):
     sample_size = min(num_samples, len(cluster_indices))
     sample_indices = random.sample(list(cluster_indices), sample_size)
     
-    print(f"군집 {cluster_num}에 속한 이미지들:")
+    print(f"Representative images from Cluster {cluster_num}")
     for idx in sample_indices:
         img_name = dataset.dataframe.iloc[idx]['Name']
         print(f"Image name: {img_name}")
     
     dataset.show_images(sample_indices)
 
-def get_cluster_categories(dataset, kmeans, features, labels):
+def get_cluster_categories(dataset, kmeans, features, labels, threshold=0.3):
     cluster_categories = {}
     
     unique_clusters = np.unique(labels)
     
     for cluster_num in unique_clusters:
-        centroid = kmeans.cluster_centers_[cluster_num]
-        
         cluster_indices = np.where(labels == cluster_num)[0]
         
         if len(cluster_indices) > 0:
-            cluster_features = features[cluster_indices]
-            distances = euclidean_distances([centroid], cluster_features)[0]
+            categories = [dataset.dataframe.iloc[idx]['Name'][:2] for idx in cluster_indices]
+            category_counts = {}
+            total = len(cluster_indices)
             
-            closest_idx = cluster_indices[np.argmin(distances)]
+            for cat in categories:
+                category_counts[cat] = category_counts.get(cat, 0) + 1
             
-            img_name = dataset.dataframe.iloc[closest_idx]['Name']
-            category = img_name[:2]
-            
-            cluster_categories[cluster_num] = category
+            # 가장 많은 카테고리의 비율이 임계값을 넘을 때만 할당
+            max_category, max_count = max(category_counts.items(), key=lambda x: x[1])
+            if max_count/total >= threshold:
+                cluster_categories[cluster_num] = max_category
+            else:
+                # 임계값을 넘지 못하면 "Mixed" 등으로 표시하거나
+                # 상위 2개 카테고리를 함께 표시할 수 있습니다
+                sorted_cats = sorted(category_counts.items(), key=lambda x: x[1], reverse=True)
+                if len(sorted_cats) >= 2:
+                    cluster_categories[cluster_num] = f"{sorted_cats[0][0]}/{sorted_cats[1][0]}"
+                else:
+                    cluster_categories[cluster_num] = max_category
     
     return cluster_categories
+
+def compare_cluster_categories(cluster_dict, category_mapping):
+   analysis = {
+       'present': {}, 
+       'missing': [], 
+       'duplicates': {} 
+   }
+   
+   for _, category in cluster_dict.items():
+       analysis['present'][category] = analysis['present'].get(category, 0) + 1
+   
+   for expected in category_mapping.values():
+       if expected not in analysis['present']:
+           analysis['missing'].append(expected)
+   
+   analysis['duplicates'] = {k: v for k, v in analysis['present'].items() if v > 1}
+   
+   print("=== 클러스터 분석 ===")
+   print(f"\n전체 카테고리 수: {len(category_mapping)}")
+   print(f"현재 포함된 카테고리 수: {len(analysis['present'])}")
+   print(f"누락된 카테고리 수: {len(analysis['missing'])}")
+   
+   print("\n현재 카테고리 분포:")
+   for cat, count in analysis['present'].items():
+       print(f"- {cat}: {count}번")
+   
+   if analysis['missing']:
+       print("\n누락된 카테고리:")
+       for cat in analysis['missing']:
+           print(f"- {cat}")
+   
+   if analysis['duplicates']:
+       print("\n중복된 카테고리:")
+       for cat, count in analysis['duplicates'].items():
+           print(f"- {cat}: {count}번 중복")
+           
+   return analysis
