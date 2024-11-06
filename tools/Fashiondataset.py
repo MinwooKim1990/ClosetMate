@@ -76,37 +76,30 @@ class FashionDataset(Dataset):
         return dataset
 
     def show_images(self, indices):
-        # Ensure indices is a list
         if not isinstance(indices, list):
             raise TypeError("indices should be a list of integers.")
-        
-        # Determine grid dimensions
+
         num_images = len(indices)
         cols = 5
         rows = math.ceil(num_images / cols)
         
-        # Create the subplot grid
         fig, axes = plt.subplots(rows, cols, figsize=(cols * 3, rows * 3))
-        axes = axes.flatten()  # Flatten for easy indexing
+        axes = axes.flatten() 
         i=1
         for ax, idx in zip(axes, indices):
             try:
-                # Retrieve the image path and open the image
                 img_name = self.dataframe.iloc[idx]['Name']
                 img_path = os.path.join(self.image_folder, f"{img_name}.jpg")
                 image = Image.open(img_path).convert('RGB')
                 
-                # Display the image
                 ax.imshow(image)
                 ax.axis('off')
                 ax.set_title(f"Top {i}")
                 i+=1
             except Exception as e:
-                # Handle any errors in loading or displaying the image
                 ax.axis('off')
                 ax.set_title("Image not found")
 
-        # Turn off any remaining empty subplot axes
         for ax in axes[len(indices):]:
             ax.axis('off')
         

@@ -50,13 +50,10 @@ def get_cluster_categories(dataset, kmeans, features, labels, threshold=0.3):
             for cat in categories:
                 category_counts[cat] = category_counts.get(cat, 0) + 1
             
-            # 가장 많은 카테고리의 비율이 임계값을 넘을 때만 할당
             max_category, max_count = max(category_counts.items(), key=lambda x: x[1])
             if max_count/total >= threshold:
                 cluster_categories[cluster_num] = max_category
             else:
-                # 임계값을 넘지 못하면 "Mixed" 등으로 표시하거나
-                # 상위 2개 카테고리를 함께 표시할 수 있습니다
                 sorted_cats = sorted(category_counts.items(), key=lambda x: x[1], reverse=True)
                 if len(sorted_cats) >= 2:
                     cluster_categories[cluster_num] = f"{sorted_cats[0][0]}/{sorted_cats[1][0]}"
