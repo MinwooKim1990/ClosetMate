@@ -4,16 +4,6 @@ from tools.saving import save_index, load_index
 
 class Similarity:
     def __init__(self, feature_vectors=None, dataset=None, user_name=None, user_vector=None, model_type=None, force_new=False):
-        """
-        Initialize Similarity class
-        
-        Args:
-            feature_vectors (np.ndarray, optional): Feature vectors for all items
-            dataset (list, optional): Original dataset
-            user_name (str, optional): User identifier for saving/loading
-            user_vector (np.ndarray, optional): User preference vector
-            force_new (bool): Force new index creation even if saved exists
-        """
         self.user_name = user_name
         self.dataset = dataset
         self.model_type = model_type
@@ -37,7 +27,6 @@ class Similarity:
         
         self.original_feature_vectors = feature_vectors.copy()
 
-        # Initialize user vector if provided
         self.user_vector = None
         if user_vector is not None:
             self.user_vector = user_vector / np.linalg.norm(user_vector, axis=1, keepdims=True)

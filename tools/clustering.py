@@ -2,7 +2,6 @@ from sklearn.cluster import KMeans
 from tools.saving import save_labels, load_labels, save_kmeans_model, load_kmeans_model
 import numpy as np
 import random
-from sklearn.metrics.pairwise import euclidean_distances
 
 
 def perform_clustering_with_cache(user_name, features, model_type, n_clusters=13, force_cluster=False):
